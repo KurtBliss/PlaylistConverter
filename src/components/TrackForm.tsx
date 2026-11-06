@@ -1,14 +1,13 @@
-import { useEffect, useState, type SubmitEvent } from "react"
+import { type SubmitEvent } from "react"
 import { useTrackSearch } from "../hooks/useTrackSearch"
 
 
 export function TrackForm() {
-    const { url, setUrl, search } = useTrackSearch()
+    const { url, setUrl, spotifyUrl, search } = useTrackSearch()
 
     function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
-        search(url)
-        
+        search(url)        
     }
 
     return <form onSubmit={handleSubmit}>
@@ -18,19 +17,6 @@ export function TrackForm() {
             onChange={(e) => setUrl(e.target.value)} 
         />
         <button>Submit</button>
+        {spotifyUrl && <p><a href={spotifyUrl}>{spotifyUrl}</a></p>}
     </form>
 }
-
-
-
-
-/* 
-
-
-tags Array(3)
-0 "Dinosaur Pile-Up"
-1 "Celebrity Mansions"
-2 "Thrash Metal Cassette"
-
-
-*/
