@@ -1,48 +1,63 @@
-import { getSpotifyToken } from "../_lib/spotify"
+import { getSpotifyToken } from "../_lib/spotify";
 
-type SearchResponse = {
-    tracks: Tracks
-}
-
-type Tracks = {
-    items: Track[]
-}
-
-type Track = {
-    name: string,
-    id: string
+type TrackResponse = {
+    album: {
+        name: string;
+    };
+    artists: {
+        name: string;
+    }[];
+    name: string;
 }
 
 export default {
-  async fetch(request: Request) {
-    const { access_token } = await getSpotifyToken();
-    if (typeof access_token != "string") {
-        return Response.json({ error: "Failed to retrieve Spotify token" });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const artist = searchParams.get("artist");
-    const album = searchParams.get("album");
-    const track = searchParams.get("track");
-    const params = new URLSearchParams({
-        q: `${track} artist:${artist}`,
-        type: "track",
-        limit: "1"
-    });
-
-    const response = await fetch(`https://api.spotify.com/v1/search?${params}`, {
-        headers: {
-            Authorization: `Bearer ${access_token}`
+    async fetch(request: Request) {
+        const { access_token } = await getSpotifyToken();
+        if (typeof access_token != "string") {
+            return Response.json({ error: "Failed to retrieve Spotify token" });
         }
-    })
-    if (!response.ok) {
-        return Response.json({ok: false});
+
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get("id");
+        if (!id) {
+            return Response.json({ error: "Missing track ID" });
+        }
+
+        const response = await fetch(`https://api.spotify.com/v1/tracks/${id}`, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+        });
+        if (!response.ok) {
+            return Response.json({ ok: false,error: "Failed to retrieve track" });
+        }
+
+        const data = await response.json();
+        // console.log("Retrieved track data:", data);
+
+
+
+        return Response.json({ ok: true,
+            album: data.album.name,
+            artist: data.artists[0].name,
+            track: data.name,
+         });
     }
-    const data = await response.json() as SearchResponse;
-    const spotifyUrl = `https://open.spotify.com/track/${data.tracks.items[0].id}`
-    return Response.json({ok: true, spotifyUrl});
-  },
-};
+}
 
 
-// https://developer.spotify.com/documentation/web-api/reference/search
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

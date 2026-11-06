@@ -20,6 +20,15 @@ interface VideoListResponseItemSnippet {
     tags: string[]
 }
 
+interface SearchResponse {
+    items: {
+        id: {
+            videoId: string
+        }
+    }[],
+    kind: string
+}
+
 // https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id=Ks-_Mh1QhMc&key=AIzaSyAA1PTL6ioqlBUylfdXwD4GhSOF1npcdxU
 export async function getVideoDetails(videoId: string): Promise<TrackDetails | null> {
     const params = new URLSearchParams({
@@ -50,6 +59,24 @@ export async function getVideoDetails(videoId: string): Promise<TrackDetails | n
     //     console.log("err", err)
     //     return null
     // })
+}
+
+
+export async function search(query: { artist: string, album: string, track: string }) {
+    const params = new URLSearchParams({
+        part: "snippet",
+        q: `${query.track} ${query.artist} ${query.album}`,
+        maxResults: "1",
+        key: KEY,
+    });
+
+    const response = await fetch(`${API}search?${params}`)
+    if (!response.ok) return null
+
+    const responseData = await response.json() as SearchResponse
+    const videoId = responseData.items[0]?.id.videoId
+    
+    return `https://music.youtube.com/watch?v=${videoId}`
 }
 
 
