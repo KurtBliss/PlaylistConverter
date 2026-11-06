@@ -33,12 +33,10 @@ export default {
     }
 
     const { searchParams } = new URL(request.url);
-    // const id = searchParams.get("id");
     const artist = searchParams.get("artist");
     const album = searchParams.get("album");
     const track = searchParams.get("track");
 
-    // if (!id) {}
     const params = new URLSearchParams({
         q: `${track} artist:${artist} album:${album}`,
         type: "track",
