@@ -1,4 +1,4 @@
-import { getSpotifyToken } from "../_lib/spotify"
+import { getSpotifyToken } from "../_lib/spotify.ts"
 
 type SearchResponse = {
     tracks: Tracks
@@ -27,7 +27,7 @@ type Album = {
 
 export default {
   async fetch(request: Request) {
-    const { access_token } = await getSpotifyToken();
+    const { access_token } = await getSpotifyToken() as { access_token: string };
     if (typeof access_token != "string") {
         return Response.json({ error: "Failed to retrieve Spotify token" });
     }
