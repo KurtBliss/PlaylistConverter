@@ -19,7 +19,9 @@ export function useTrackSearch() {
 
         if (parsed.platform == "youtube") {
             console.log("youtube video id", parsed.id)
-            const results = await getVideoDetails(parsed.id)
+            //const results = await getVideoDetails(parsed.id)
+            const response = await fetch(`/api/youtube/track?videoId=${parsed.id}`)
+            const results = await response.json()
             // console.log("getVideoDetails", results)
             const params = new URLSearchParams({
                 ...results
@@ -50,12 +52,21 @@ export function useTrackSearch() {
 
             
             // get/find youtube music link
-            const query = await searchYoutube({
+            const params = new URLSearchParams({
                 artist: trackData.artist,
                 album: trackData.album,
                 track: trackData.track
             })
-            setSpotifyUrl(query as string)
+            const request = await fetch(`/api/youtube/search?${params}`)
+            const results = await request.json()
+            console.log("YouTube search results:", results)
+            setSpotifyUrl(results.url)
+            // const query = await searchYoutube({
+            //     artist: trackData.artist,
+            //     album: trackData.album,
+            //     track: trackData.track
+            // })
+            // setSpotifyUrl(query as string)
 
             
             
