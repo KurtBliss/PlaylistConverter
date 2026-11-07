@@ -1,89 +1,92 @@
 import { useState } from "react"
 import { parseTrackUrl } from "../utils/urlParser"
 
+export type SearchResult = {
+  platform: "youtube" | "spotify";
+  url: string;
+  title?: string;
+  artist?: string;
+} | null;
 
 export function useTrackSearch() {
-    
-    const [url, setUrl] = useState("https://open.spotify.com/track/7aqcjiCHABnqRNanxUI8zm?si=76e13325ea7a4e5f")
-    // const [url, setUrl] = useState("https://music.youtube.com/watch?v=jR1qfL9f6_g&si=xpCUUSGUdW8K8spa")
-    const [spotifyUrl, setSpotifyUrl] = useState("")
+    const [url, setUrl] = useState("")
+    const [result, setResult] = useState<SearchResult>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     async function search(url: string) {
-        const parsed = parseTrackUrl(url)
+        setLoading(true)
+        setError(null)
+        setResult(null)
 
+        const parsed = parseTrackUrl(url)
         if (!parsed) {
-            console.log("Could not parse url")
+            setError("Could not parse url")
+            setLoading(false)
             return
         }
 
-        if (parsed.platform == "youtube") {
-            console.log("youtube video id", parsed.id)
-            //const results = await getVideoDetails(parsed.id)
-            const response = await fetch(`/api/youtube/track?videoId=${parsed.id}`)
-            const results = await response.json()
-            // console.log("getVideoDetails", results)
-            const params = new URLSearchParams({
-                ...results
-            });
-            // console.log("params", params)
-            console.log("making internal spotify search request")
-            await fetch(`/api/spotify/search?${params}`).then(async results => {
-                const data = await results.json()
-                console.log("Spotify search results:", data)
-                setSpotifyUrl(data.spotifyUrl)
-            }).catch(error => {
-                console.error("Failed to retrieve Spotify track:", error)
-            })
-        } 
-        
-        else if (parsed.platform == "spotify") {
-            console.log("spotify track id", parsed.id)
+        try {
+            if (parsed.platform == "youtube") {
+                // get track details from youtube
+                const youtubeRes = await fetch(`/api/youtube/track?videoId=${parsed.id}`)
+                if (!youtubeRes.ok) throw new Error("Failed to retrieve YouTube track when getting spotify url")
+                const youtubeData = await youtubeRes.json()
 
-            // get track details
-            const trackResponse = await fetch(`/api/spotify/track?id=${parsed.id}`)
-            if (!trackResponse.ok) {
-                console.error("Failed to retrieve Spotify track")
-                return
+                console.log('youtubeData:', youtubeData);
+
+                // search spotify with youtube track details
+                const params = new URLSearchParams({
+                    artist: youtubeData.artist ?? "",
+                    album: youtubeData.album ?? "",
+                    track: youtubeData.track ?? ""
+                });
+
+                console.log('params:', params.toString());
+
+                const spotifyRes = await fetch(`/api/spotify/search?${params}`)
+                if (!spotifyRes.ok) throw new Error("Failed to retrieve Spotify track when getting spotify url")
+                const spotifyData = await spotifyRes.json()
+                
+                setResult({
+                    platform: "spotify",
+                    url: spotifyData.url,
+                    title: spotifyData.title,
+                    artist: spotifyData.artist
+                })
+            } 
+            
+            else if (parsed.platform == "spotify") {
+                // get track details from spotify
+                const spotifyRes = await fetch(`/api/spotify/track?id=${parsed.id}`)
+                if (!spotifyRes.ok) throw new Error("Failed to retrieve Spotify track when getting youtube url")
+                const spotifyData = await spotifyRes.json()
+
+                // search youtube with spotify track details
+                const params = new URLSearchParams({
+                    artist: spotifyData.artist ?? "",
+                    album: spotifyData.album ?? "",
+                    track: spotifyData.track ?? ""
+                })
+
+                const youtubeRes = await fetch(`/api/youtube/search?${params}`)
+                if (!youtubeRes.ok) throw new Error("Failed to retrieve YouTube track when getting youtube url")
+                const youtubeData = await youtubeRes.json()
+
+                setResult({
+                    platform: "youtube",
+                    url: youtubeData.url,
+                    title: youtubeData.title,
+                    artist: youtubeData.artist
+                })
             }
-
-            const trackData = await trackResponse.json()
-            console.log("Spotify track data:", trackData)
-
-            
-            // get/find youtube music link
-            const params = new URLSearchParams({
-                artist: trackData.artist,
-                album: trackData.album,
-                track: trackData.track
-            })
-            const request = await fetch(`/api/youtube/search?${params}`)
-            const results = await request.json()
-            console.log("YouTube search results:", results)
-            setSpotifyUrl(results.url)
-            // const query = await searchYoutube({
-            //     artist: trackData.artist,
-            //     album: trackData.album,
-            //     track: trackData.track
-            // })
-            // setSpotifyUrl(query as string)
-
-            
-            
-            // https://developer.spotify.com/documentation/web-api/reference/get-track
+        } catch (error) {
+            console.error("Failed to search track:", error)
+            setError("Failed to search track")
+        } finally {
+            setLoading(false)
         }
     }
     
-    return { url, setUrl, spotifyUrl, search }
+    return { url, setUrl, result, loading, error, search }
 }
-
-
-
-
-/*
-await fetch(`/api/spotify/track?id=${parsed.id}`).then(async results => {
-    const data = await results.json()
-    console.log("Spotify track data:", data)
-}).catch(error => {
-    console.error("Failed to retrieve Spotify track:", error)
-})
-*/

@@ -1,28 +1,20 @@
 import { getSpotifyToken } from "../_lib/spotify.ts"
 
 type SearchResponse = {
-    tracks: Tracks
-}
-
-type Tracks = {
-    items: Track[]
-}
-
-type Track = {
-    name: string,
-    id: string,
-    artists: Artist[],
-    album: Album
-}
-
-type Artist = {
-    name: string,
-    id: string
-}
-
-type Album = {
-    name: string,
-    id: string
+    tracks: {
+        items: {
+            name: string,
+            id: string,
+            artists: {
+                name: string,
+                id: string
+            }[],
+            album: {
+                name: string,
+                id: string
+            }
+        }[]
+    }
 }
 
 export default {
@@ -38,7 +30,7 @@ export default {
     const track = searchParams.get("track");
 
     const params = new URLSearchParams({
-        q: `${track} artist:${artist} album:${album}`,
+        q: `${track} artist:${artist} ${album != "" ? `album:${album}` : ""}`,
         type: "track",
         limit: "1"
     });
@@ -53,11 +45,12 @@ export default {
     }
 
     const data = await response.json() as SearchResponse;
+    console.log('data:', data);
     const spotifyTrack = data.tracks.items[0];
     console.log('spotifyTrack:', spotifyTrack);
     const spotifyUrl = `https://open.spotify.com/track/${spotifyTrack.id}`
     return Response.json({ok: true, 
-        spotifyUrl, 
+        url: spotifyUrl, 
         track: spotifyTrack.name, 
         artist: spotifyTrack.artists[0].name,
         album: spotifyTrack.album.name

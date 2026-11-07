@@ -3,7 +3,7 @@ import { useTrackSearch } from "../hooks/useTrackSearch"
 
 
 export function TrackForm() {
-    const { url, setUrl, spotifyUrl, search } = useTrackSearch()
+    const { url, setUrl, result, loading, error, search } = useTrackSearch()
 
     function handleSubmit(e: SubmitEvent) {
         e.preventDefault()
@@ -16,7 +16,9 @@ export function TrackForm() {
             value={url} 
             onChange={(e) => setUrl(e.target.value)} 
         />
-        <button>Submit</button>
-        {spotifyUrl && <p><a href={spotifyUrl}>{spotifyUrl}</a></p>}
+        <button disabled={loading}>Submit</button>
+        {loading && <p>Loading...</p>}
+        {error && <p>{error}</p>}
+        {result && <p><a href={result.url}>{result.url}</a></p>}
     </form>
 }
