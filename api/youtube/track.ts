@@ -22,7 +22,7 @@ export default {
         const params = new URLSearchParams({
             part: "snippet,contentDetails,statistics",
             id: videoId,
-            key: process.env.YOUTUBE_API_KEY as string,
+            key: process.env.VERCEL_YOUTUBE_API_KEY as string,
         });
         console.log("internal youtube api params", params.toString());
         const response = await fetch(`https://youtube.googleapis.com/youtube/v3/videos?${params}`);

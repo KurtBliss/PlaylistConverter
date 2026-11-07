@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { getVideoDetails, search as searchYoutube } from "../services/youtube"
 import { parseTrackUrl } from "../utils/urlParser"
 
 

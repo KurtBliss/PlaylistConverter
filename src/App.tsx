@@ -1,13 +1,6 @@
 import { TrackForm } from "./components/TrackForm"
 
 
-function handle() {
-  fetch("/api/spotify/track").then(async results => {
-    console.log(await results.json())
-  })
-}
-
-
 function App() {  
   return <>
       <TrackForm />
