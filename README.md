@@ -41,52 +41,37 @@ src/
 ### Prerequisites
 
 - Node.js 18+
+- [Vercel CLI](https://vercel.com/docs/cli) (`npm i -g vercel`)
 - A [Spotify Developer](https://developer.spotify.com/) app
 - A [Google Cloud](https://console.cloud.google.com/) project with the YouTube Data API enabled
 
 ### Environment Variables
 
-Create a `.env.local` file (or use `vercel env pull .env.local`):
+Pull them from Vercel (recommended):
+
+```bash
+vercel env pull .env.local
+```
+
+Or create `.env.local` manually:
 
 ```env
-# Spotify (Client Credentials)
-SPOTIFY_CLIENT_ID=
-SPOTIFY_CLIENT_SECRET=
-
-# YouTube / Google
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-YOUTUBE_API_KEY=
-
-# Optional: Vercel
-VERCEL_URL=
+VERCEL_SPOTIFY_CLIENT=
+VERCEL_SPOTIFY_SECRET=
+VERCEL_GOOGLE_CLIENT=
+VERCEL_GOOGLE_SECRET=
+VERCEL_YOUTUBE_API_KEY=
 ```
 
-> **Note:** Client secrets and the YouTube API key are only used in serverless functions. Do not expose them in the frontend.
+> Client secrets and API keys are only used in serverless functions.
 
-### Install & Run
+### Run Locally
 
 ```bash
-npm install
-npm run dev
+vercel dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173).
-
-For local serverless functions, use:
-
-```bash
-npx vercel dev
-```
-
-## Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Vite dev server |
-| `npm run build` | Type-check and build for production |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Run Oxlint |
+Open the URL shown in the terminal (usually [http://localhost:3000](http://localhost:3000)).
 
 ## Deployment
 
