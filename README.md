@@ -1,32 +1,107 @@
-# React + TypeScript + Vite
+# Playlist Converter
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Convert tracks and playlists between **YouTube Music** and **Spotify**.
 
-Currently, two official plugins are available:
+Paste a song or playlist URL from either platform and get matching links on the other.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Live app:** [playlist-converter-chi.vercel.app](https://playlist-converter-chi.vercel.app/)
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Convert individual tracks between YouTube Music and Spotify
+- Convert public playlists (in progress)
+- YouTube OAuth with httpOnly cookies for playlist creation
+- Serverless API routes (Vercel) so API keys stay off the client
 
-## Expanding the Oxlint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+- **Frontend:** React 19 + TypeScript + Vite
+- **Backend:** Vercel Serverless Functions (`/api`)
+- **APIs:** YouTube Data API v3, Spotify Web API
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## Project Structure
+
+```
+api/
+  _lib/          # Shared Spotify & Google helpers
+  auth/google/   # YouTube OAuth login + callback
+  spotify/       # track, search, playlist, create-playlist
+  youtube/       # track, search, playlist, create-playlist
+
+src/
+  components/    # TrackForm, Results
+  hooks/         # useTrackSearch
+  services/      # Client-side API wrappers
+  types/         # Shared TypeScript types
+  utils/         # URL parsing
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- A [Spotify Developer](https://developer.spotify.com/) app
+- A [Google Cloud](https://console.cloud.google.com/) project with the YouTube Data API enabled
+
+### Environment Variables
+
+Create a `.env.local` file (or use `vercel env pull .env.local`):
+
+```env
+# Spotify (Client Credentials)
+SPOTIFY_CLIENT_ID=
+SPOTIFY_CLIENT_SECRET=
+
+# YouTube / Google
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+YOUTUBE_API_KEY=
+
+# Optional: Vercel
+VERCEL_URL=
+```
+
+> **Note:** Client secrets and the YouTube API key are only used in serverless functions. Do not expose them in the frontend.
+
+### Install & Run
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173).
+
+For local serverless functions, use:
+
+```bash
+npx vercel dev
+```
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Vite dev server |
+| `npm run build` | Type-check and build for production |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Run Oxlint |
+
+## Deployment
+
+Deployed on [Vercel](https://vercel.com/kurtlyn/playlist-converter).
+
+Push to `main` to trigger a production deploy.
+
+## Status
+
+- [x] Single track conversion (YouTube ↔ Spotify)
+- [x] YouTube OAuth (httpOnly cookie)
+- [ ] Full playlist conversion
+- [ ] Shareable playlist links
+- [ ] Better matching / confidence scores
+
+## License
+
+Private project.
