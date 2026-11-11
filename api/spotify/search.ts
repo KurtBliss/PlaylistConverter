@@ -51,6 +51,7 @@ export default {
     const spotifyUrl = `https://open.spotify.com/track/${spotifyTrack.id}`
     return Response.json({ok: true, 
         url: spotifyUrl, 
+        id: spotifyTrack.id,
         track: spotifyTrack.name, 
         artist: spotifyTrack.artists[0].name,
         album: spotifyTrack.album.name

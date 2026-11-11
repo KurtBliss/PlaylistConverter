@@ -58,18 +58,20 @@ export default {
         let album = "";
         let track = "";
         
-        if (snippet.tags.length == 3) {
+        if (snippet.tags == null 
+        || snippet.tags.length == 0 
+        || snippet.tags.length > 3) {
+            artist = cleanChannel(snippet.channelTitle);
+            track = cleanTitle(snippet.title);
+            track = removeArtistFromTitle(track, artist);
+        } else if (snippet.tags.length == 3) {
             artist = snippet.tags[0];
             album = snippet.tags[1];
             track = snippet.tags[2];
         } else if (snippet.tags.length == 2) {
             artist = snippet.tags[0];
             track = snippet.tags[1];
-        } else {
-            artist = cleanChannel(snippet.channelTitle);
-            track = cleanTitle(snippet.title);
-            track = removeArtistFromTitle(track, artist);
-        }
+        } 
 
         return Response.json({ 
             ok: true, 

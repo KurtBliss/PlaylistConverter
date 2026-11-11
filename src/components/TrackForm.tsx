@@ -20,5 +20,6 @@ export function TrackForm() {
         {loading && <p>Loading...</p>}
         {error && <p>{error}</p>}
         {result && <p><a href={result.url}>{result.url}</a></p>}
+        <div><a href="/api/auth/google/login">Connect YouTube</a></div>
     </form>
 }

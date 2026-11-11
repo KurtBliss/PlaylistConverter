@@ -27,7 +27,7 @@ export function useTrackSearch() {
         }
 
         try {
-            if (parsed.platform == "youtube") {
+            if (parsed.platform == "youtube" && parsed.type == "track") {
                 // get track details from youtube
                 const youtubeRes = await fetch(`/api/youtube/track?videoId=${parsed.id}`)
                 if (!youtubeRes.ok) throw new Error("Failed to retrieve YouTube track when getting spotify url")
@@ -56,7 +56,7 @@ export function useTrackSearch() {
                 })
             } 
             
-            else if (parsed.platform == "spotify") {
+            else if (parsed.platform == "spotify" && parsed.type == "track") {
                 // get track details from spotify
                 const spotifyRes = await fetch(`/api/spotify/track?id=${parsed.id}`)
                 if (!spotifyRes.ok) throw new Error("Failed to retrieve Spotify track when getting youtube url")
@@ -79,6 +79,36 @@ export function useTrackSearch() {
                     title: youtubeData.title,
                     artist: youtubeData.artist
                 })
+            }
+
+            else if (parsed.platform == "spotify" && parsed.type == "playlist") {
+                // get playlist details from spotify
+                console.log('parsed:', parsed);
+                const spotifyRes = await fetch(`/api/spotify/playlist?id=${parsed.id}`)
+                if (!spotifyRes.ok) throw new Error("Failed to retrieve Spotify playlist")
+                const spotifyData = await spotifyRes.json()
+                console.log('spotifyData:', spotifyData);
+
+                // search youtube with spotify playlist tracks
+                const youtubeResults = []
+                for (const track of spotifyData.tracks) {
+                    const params = new URLSearchParams({
+                        artist: track.artists ?? "",
+                        album: track.album ?? "",
+                        track: track.track ?? ""
+                    })
+
+                    const youtubeRes = await fetch(`/api/youtube/search?${params}`)
+                    if (!youtubeRes.ok) throw new Error("Failed to retrieve YouTube track")
+                    const youtubeData = await youtubeRes.json()
+                    youtubeResults.push(youtubeData)
+
+                    
+                }
+                console.log('youtubeResults:', youtubeResults);
+
+
+                
             }
         } catch (error) {
             console.error("Failed to search track:", error)
