@@ -1,3 +1,5 @@
+import { findTrackDetails } from "../_lib/google.ts";
+
 interface VideoListResponse {
     items: {
         snippet: {
@@ -8,26 +10,6 @@ interface VideoListResponse {
         kind: string
     }[],
     kind: string
-}
-
-function cleanTitle(title: string): string {
-  return title
-    .replace(/\(.*?\)|\[.*?\]/g, "")          // remove (Lyric Video), [Official Video], etc.
-    .replace(/official|lyric|video|audio|hq|hd/gi, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function cleanChannel(channel: string): string {
-  return channel
-    .replace(/VEVO|Official|Music|Topic/gi, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function removeArtistFromTitle(title: string, artist: string): string {
-  const regex = new RegExp(`^${artist}\\s*[-–—:]\\s*`, "i");
-  return title.replace(regex, "").trim();
 }
 
 export default {
@@ -54,30 +36,13 @@ export default {
 
         console.log('snippet:', snippet);
         
-        let artist = "";
-        let album = "";
-        let track = "";
-        
-        if (snippet.tags == null 
-        || snippet.tags.length == 0 
-        || snippet.tags.length > 3) {
-            artist = cleanChannel(snippet.channelTitle);
-            track = cleanTitle(snippet.title);
-            track = removeArtistFromTitle(track, artist);
-        } else if (snippet.tags.length == 3) {
-            artist = snippet.tags[0];
-            album = snippet.tags[1];
-            track = snippet.tags[2];
-        } else if (snippet.tags.length == 2) {
-            artist = snippet.tags[0];
-            track = snippet.tags[1];
-        } 
+        const trackDetails = findTrackDetails(snippet.title, snippet.channelTitle, snippet.tags);
 
         return Response.json({ 
             ok: true, 
-            artist,
-            album,
-            track
+            foundArtist: trackDetails.foundArtist,
+            foundAlbum: trackDetails.foundAlbum,
+            foundTrack: trackDetails.foundTrack
         });
     }
 }

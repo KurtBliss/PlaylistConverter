@@ -1,8 +1,15 @@
+import { findTrackDetails } from "../_lib/google.ts";
+
 interface SearchResponse {
     items: {
         id: {
             videoId: string
-        }
+        },
+        snippet: {
+            title: string,
+            channelTitle: string,
+            tags: string[]
+        },
     }[],
     kind: string
 }
@@ -10,13 +17,13 @@ interface SearchResponse {
 export default {
     async fetch(request: Request) {
         const { searchParams } = new URL(request.url);
-        const artist = searchParams.get("artist");
-        const album = searchParams.get("album");
-        const track = searchParams.get("track");
+        let searchedArtist = searchParams.get("artist");
+        let searchedAlbum = searchParams.get("album");
+        let searchedTrack = searchParams.get("track");
 
         const params = new URLSearchParams({
             part: "snippet",
-            q: `${track} ${artist} ${album}`,
+            q: `${searchedTrack} ${searchedArtist} ${searchedAlbum}`,
             maxResults: "1",
             key: process.env.VERCEL_YOUTUBE_API_KEY as string,
         });
@@ -31,9 +38,21 @@ export default {
         const videoId = data.items[0].id.videoId;
         console.log("internal youtube api got videoId", videoId);
 
+        const snippet = data.items[0].snippet;
+        console.log('snippet:', snippet);
+
+        const trackDetails = findTrackDetails(snippet.title, snippet.channelTitle, snippet.tags);
+
         return Response.json({ 
             ok: true ,
-            url: `https://music.youtube.com/watch?v=${videoId}`
+            url: `https://music.youtube.com/watch?v=${videoId}`,
+            videoId,
+            searchedTrack,
+            searchedArtist,
+            searchedAlbum,
+            foundTrack: trackDetails.foundTrack,
+            foundArtist: trackDetails.foundArtist,
+            foundAlbum: trackDetails.foundAlbum,
         });
     }
 }

@@ -27,6 +27,7 @@ export function useTrackSearch() {
         }
 
         try {
+            // Input: YouTube track URL
             if (parsed.platform == "youtube" && parsed.type == "track") {
                 // get track details from youtube
                 const youtubeRes = await fetch(`/api/youtube/track?videoId=${parsed.id}`)
@@ -37,9 +38,9 @@ export function useTrackSearch() {
 
                 // search spotify with youtube track details
                 const params = new URLSearchParams({
-                    artist: youtubeData.artist ?? "",
-                    album: youtubeData.album ?? "",
-                    track: youtubeData.track ?? ""
+                    artist: youtubeData.foundArtist ?? "",
+                    album: youtubeData.foundAlbum ?? "",
+                    track: youtubeData.foundTrack ?? ""
                 });
 
                 console.log('params:', params.toString());
@@ -56,6 +57,7 @@ export function useTrackSearch() {
                 })
             } 
             
+            // Input: Spotify track URL
             else if (parsed.platform == "spotify" && parsed.type == "track") {
                 // get track details from spotify
                 const spotifyRes = await fetch(`/api/spotify/track?id=${parsed.id}`)
@@ -76,12 +78,17 @@ export function useTrackSearch() {
                 setResult({
                     platform: "youtube",
                     url: youtubeData.url,
-                    title: youtubeData.title,
-                    artist: youtubeData.artist
+                    title: youtubeData.foundTrack,
+                    artist: youtubeData.foundArtist
                 })
             }
 
+            // Input: Spotify playlist URL
             else if (parsed.platform == "spotify" && parsed.type == "playlist") {
+
+                // TODO: check if the playlist is public or private?
+                // TODO: check for user authentication?
+
                 // get playlist details from spotify
                 console.log('parsed:', parsed);
                 const spotifyRes = await fetch(`/api/spotify/playlist?id=${parsed.id}`)
@@ -102,11 +109,14 @@ export function useTrackSearch() {
                     if (!youtubeRes.ok) throw new Error("Failed to retrieve YouTube track")
                     const youtubeData = await youtubeRes.json()
                     youtubeResults.push(youtubeData)
-
-                    
                 }
                 console.log('youtubeResults:', youtubeResults);
 
+                // create YouTube playlist
+                // how to pass array of YouTube data to create playlist?
+                for (const youtubeData of youtubeResults) {
+
+                }
 
                 
             }
