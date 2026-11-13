@@ -113,10 +113,17 @@ export function useTrackSearch() {
                 console.log('youtubeResults:', youtubeResults);
 
                 // create YouTube playlist
-                // how to pass array of YouTube data to create playlist?
-                for (const youtubeData of youtubeResults) {
-
-                }
+                const createRes = await fetch("/api/youtube/create-playlist", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: "Converted Spotify Playlist",
+                        tracks: youtubeResults, // your array of track objects
+                    }),
+                });
+                if (!createRes.ok) throw new Error("Failed to create YouTube playlist")
+                const createData = await createRes.json()
+                console.log('createData:', createData);
 
                 
             }
