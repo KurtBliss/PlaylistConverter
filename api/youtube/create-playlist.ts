@@ -6,9 +6,8 @@ export default {
             return new Response("Method not allowed", { status: 405 });
         }
 
-        const body = await request.json() as { title: string; tracks: {id: string}[] };
-        const { title, tracks } = body;
-        title;
+        const body = await request.json() as { title: string; };
+        const { title } = body;
 
         const cookie = request.headers.get("cookie") || "";
         const match = cookie.match(/google_access_token=([^;]+)/);
@@ -19,7 +18,7 @@ export default {
         }
 
         // Create a YouTube playlist using the access token
-        const createPlaylistRes = await fetch("https://www.googleapis.com/youtube/v3/playlists", {
+        const createPlaylistRes = await fetch("https://www.googleapis.com/youtube/v3/playlists?part=snippet,status", {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${accessToken}`,
@@ -29,12 +28,20 @@ export default {
                 snippet: {
                     title: title,
                     description: "Converted Spotify Playlist",
-                    status: "public"
-                }
+                    // status: "public"
+                },
+                status: {
+                    privacyStatus: "public", // "private" | "unlisted" | "public"
+                },
             })
         });
         if (!createPlaylistRes.ok) {
-            return new Response("Failed to create YouTube playlist", { status: 500 });
+            const errText = await createPlaylistRes.text();
+            console.error("YouTube create playlist error:", createPlaylistRes.status, errText);
+            return new Response(
+                JSON.stringify({ ok: false, error: errText }),
+                { status: 500, headers: { "Content-Type": "application/json" } }
+            );
         }
         const createPlaylistData = await createPlaylistRes.json();
         console.log('createPlaylistData:', createPlaylistData);

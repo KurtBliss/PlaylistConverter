@@ -67,7 +67,7 @@ export function useTrackSearch() {
                 // search youtube with spotify track details
                 const params = new URLSearchParams({
                     artist: spotifyData.artist ?? "",
-                    album: spotifyData.album ?? "",
+                    album: "",//spotifyData.album ?? "",
                     track: spotifyData.track ?? ""
                 })
 
@@ -117,14 +117,38 @@ export function useTrackSearch() {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        title: "Converted Spotify Playlist",
-                        tracks: youtubeResults, // your array of track objects
+                        title: "Converted Spotify Playlist"
                     }),
                 });
                 if (!createRes.ok) throw new Error("Failed to create YouTube playlist")
                 const createData = await createRes.json()
                 console.log('createData:', createData);
 
+                // add tracks to the YouTube playlist
+                for (const youtubeData of youtubeResults) {
+
+                    const res = {
+                        playlistId: createData.data.id,
+                        videoId: youtubeData.videoId
+                    }
+
+                    console.log('adding res:', res);
+
+                    const addRes = await fetch("/api/youtube/add-playlist-item", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(res),
+                    });
+                    if (!addRes.ok) throw new Error("Failed to add track to YouTube playlist")
+                }
+                console.log('All tracks added to the YouTube playlist');
+
+                setResult({
+                    platform: "youtube",
+                    url: `https://www.youtube.com/playlist?list=${createData.data.id}`,
+                    title: "Converted Spotify Playlist", //youtubeData.foundTrack,
+                    artist: "", //youtubeData.foundArtist
+                })
                 
             }
         } catch (error) {
