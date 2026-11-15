@@ -24,6 +24,7 @@ export default {
         const params = new URLSearchParams({
             part: "snippet",
             q: `${searchedTrack} ${searchedArtist} ${searchedAlbum}`,
+            type: "video",
             maxResults: "1",
             key: process.env.VERCEL_YOUTUBE_API_KEY as string,
         });
