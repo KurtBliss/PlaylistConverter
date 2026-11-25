@@ -1,6 +1,6 @@
 import { getSpotifyToken } from "../_lib/spotify.ts"
 
-type SearchResponse = {
+interface SearchResponse {
     tracks: {
         items: {
             name: string,
@@ -17,8 +17,7 @@ type SearchResponse = {
     }
 }
 
-export default {
-  async fetch(request: Request) {
+export default { async fetch(request: Request) {
     const { access_token } = await getSpotifyToken() as { access_token: string };
     if (typeof access_token != "string") {
         return Response.json({ error: "Failed to retrieve Spotify token" });
@@ -45,19 +44,17 @@ export default {
     }
 
     const data = await response.json() as SearchResponse;
-    console.log('data:', data);
-    const spotifyTrack = data.tracks.items[0];
-    console.log('spotifyTrack:', spotifyTrack);
-    const spotifyUrl = `https://open.spotify.com/track/${spotifyTrack.id}`
+    const trackData = data.tracks.items[0];
+    const url = `https://open.spotify.com/track/${trackData.id}`
+
     return Response.json({ok: true, 
-        url: spotifyUrl, 
-        id: spotifyTrack.id,
-        track: spotifyTrack.name, 
-        artist: spotifyTrack.artists[0].name,
-        album: spotifyTrack.album.name
+        url, 
+        id: trackData.id,
+        track: trackData.name, 
+        artist: trackData.artists[0].name,
+        album: trackData.album.name
     });
-  },
-};
+}}
 
 
 // https://developer.spotify.com/documentation/web-api/reference/search

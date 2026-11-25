@@ -47,9 +47,10 @@ export default {
 
         return Response.json({ok: true, tracks: tracks.map(({ track }) => ({
             id: track.id,
+            url: `https://open.spotify.com/track/${track.id}`,
             track: track.name,
             album: track.album.name,
-            artists: track.artists[0].name
+            artist: track.artists[0].name
         }))});
     }
 }

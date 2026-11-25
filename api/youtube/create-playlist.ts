@@ -1,4 +1,6 @@
-
+interface CreatePlaylistResponse {
+    playlistId: string
+}
 
 export default {
     async fetch(request: Request) {
@@ -43,12 +45,16 @@ export default {
                 { status: 500, headers: { "Content-Type": "application/json" } }
             );
         }
-        const createPlaylistData = await createPlaylistRes.json();
+        const createPlaylistData = await createPlaylistRes.json() as CreatePlaylistResponse;
         console.log('createPlaylistData:', createPlaylistData);
         // const playlistId = createPlaylistData.id;
 
         // Example response
-        return new Response(JSON.stringify({ message: "Playlist created successfully", data: createPlaylistData }), {
+        return new Response(JSON.stringify({ 
+            ok: true, 
+            playlistId: createPlaylistData.playlistId,
+            url: `https://music.youtube.com/playlist?list=${createPlaylistData.playlistId}`
+        }), {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });

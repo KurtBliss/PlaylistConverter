@@ -2,6 +2,7 @@ export type ParsedTrack = {
   platform: "youtube" | "spotify";
   type: "track" | "playlist";
   id: string;
+  raw: string;
 }
 
 export function parseTrackUrl(url: string): ParsedTrack | null {
@@ -13,6 +14,7 @@ export function parseTrackUrl(url: string): ParsedTrack | null {
                 id: videoId,
                 type: "track",
                 platform: "youtube",
+                raw: url
             }
         }
     } else if (url.includes("spotify.com")) {
@@ -25,6 +27,7 @@ export function parseTrackUrl(url: string): ParsedTrack | null {
                     id: trackId,
                     type: "track",
                     platform: "spotify",
+                    raw: url
                 }
             } else if (urlParts[i] === "playlist") {
                 const parse = urlParts[i + 1]
@@ -33,6 +36,7 @@ export function parseTrackUrl(url: string): ParsedTrack | null {
                     id: playlistId,
                     type: "playlist",
                     platform: "spotify",
+                    raw: url
                 }
             }
         }
