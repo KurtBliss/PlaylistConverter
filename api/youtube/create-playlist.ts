@@ -1,5 +1,8 @@
 interface CreatePlaylistResponse {
-    playlistId: string
+    id: string;
+    snippet: {
+        title: string
+    }
 }
 
 export default {
@@ -18,6 +21,8 @@ export default {
         if (!accessToken) {
             return new Response("Unauthorized", { status: 401 });
         }
+
+        console.log("title", title)
 
         // Create a YouTube playlist using the access token
         const createPlaylistRes = await fetch("https://www.googleapis.com/youtube/v3/playlists?part=snippet,status", {
@@ -52,8 +57,9 @@ export default {
         // Example response
         return new Response(JSON.stringify({ 
             ok: true, 
-            playlistId: createPlaylistData.playlistId,
-            url: `https://music.youtube.com/playlist?list=${createPlaylistData.playlistId}`
+            playlistId: createPlaylistData.id,
+            title: createPlaylistData.snippet.title,
+            url: `https://music.youtube.com/playlist?list=${createPlaylistData.id}`
         }), {
             status: 200,
             headers: { "Content-Type": "application/json" },

@@ -224,9 +224,7 @@ export function useTrackSearch() {
             ok: boolean,
             playlistId: string,
             url: string,
-            snippet: {
-                title: string
-            }
+            title: string
         } = await createRes.json();
         console.log('createData:', createData);
 
@@ -237,7 +235,7 @@ export function useTrackSearch() {
                 ...r,
                 output: {
                     platform: "youtube",
-                    title: createData.snippet.title,
+                    title: createData.title,
                     url: createData.url,
                     success: true
                 }
