@@ -17,7 +17,7 @@ interface SearchResponse {
 export default { async fetch(request: Request) {
     const { searchParams } = new URL(request.url);
     let searchedArtist = clean(searchParams.get("artist"));
-    let searchedAlbum = clean(searchParams.get("album"));
+    // let searchedAlbum = clean(searchParams.get("album"));
     let searchedTrack = clean(searchParams.get("track"));
 
     const q = [searchedTrack, searchedArtist]

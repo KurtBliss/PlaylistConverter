@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { parseTrackUrl, type ParsedTrack } from "../utils/urlParser"
-import { type ConversionResult, type TrackInfo, type PlaylistInfo } from "../../shared/conversion"
+import { type ConversionResult, type TrackInfo } from "../../shared/conversion"
 
 export function useTrackSearch() {
     const [url, setUrl] = useState("")
